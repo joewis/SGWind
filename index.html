@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0F172A" />
+  <meta name="description" content="Realtime wind conditions for Singapore cyclists — know your headwind before you ride." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Singapore Wind</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css?v=4" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💨</text></svg>" />
+</head>
+<body>
+  <!-- Offline banner -->
+  <div id="offline-banner" class="offline-banner" hidden>Offline — showing cached data</div>
+
+  <!-- Station setup overlay -->
+  <div id="station-setup" class="station-setup" hidden>
+    <div class="station-setup__inner">
+      <div class="station-setup__logo">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="23" stroke="#0EA5E9" stroke-width="2"/>
+          <path d="M24 8 L24 24 L36 24" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M24 16 L30 24 L24 24" stroke="#0EA5E9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h1>Singapore Wind</h1>
+      <p>Pick a weather station to get started.</p>
+      <p class="station-setup__sub">We'll find the 5 nearest to your location.</p>
+      <div id="station-setup-status" class="station-setup__status"></div>
+      <div id="station-setup-list" class="station-setup__list"></div>
+      <button id="station-setup-search-all" class="btn btn--secondary">Search all stations</button>
+    </div>
+  </div>
+
+  <!-- Main app -->
+  <div id="app" class="app" hidden>
+    <!-- Cards container -->
+    <div id="cards-container" class="cards-container">
+      <!-- Card 1: Now -->
+      <div class="card" id="card-now">
+        <div class="card__header">
+          <span class="card__label">Now</span>
+          <button id="btn-settings" class="icon-btn" aria-label="Settings">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.91 1 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="now-card__body">
+          <div class="now-card__station-row">
+            <button id="btn-station-picker" class="station-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              <span id="station-name">—</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="now-card__wind">
+            <div class="wind-speed-display">
+              <span id="wind-speed-value" class="wind-speed-value">—</span>
+              <div class="wind-speed-unit-row">
+                <span id="wind-speed-unit" class="wind-speed-unit">kt</span>
+                <div id="unit-toggle" class="unit-toggle">
+                  <button class="unit-toggle__btn active" data-unit="knots">kt</button>
+                  <button class="unit-toggle__btn" data-unit="kmh">km/h</button>
+                  <button class="unit-toggle__btn" data-unit="ms">m/s</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="wind-direction-display">
+              <div class="compass-arrow-container">
+                <svg id="compass-arrow" class="compass-arrow" width="64" height="64" viewBox="0 0 64 64" fill="none">
+                  <circle cx="32" cy="32" r="30" stroke="#E2E8F0" stroke-width="1.5"/>
+                  <g transform="rotate(0 32 32)">
+                    <line x1="32" y1="32" x2="32" y2="8" stroke="#0EA5E9" stroke-width="2.5" stroke-linecap="round"/>
+                    <polygon points="32,6 28,16 32,14 36,16" fill="#0EA5E9"/>
+                    <line x1="32" y1="32" x2="32" y2="56" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round"/>
+                    <polygon points="32,58 28,48 32,50 36,48" fill="#94A3B8"/>
+                  </g>
+                </svg>
+              </div>
+              <div class="wind-direction-info">
+                <span id="wind-direction-degrees" class="wind-direction-degrees">—°</span>
+                <span id="wind-direction-cardinal" class="wind-direction-cardinal">—</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="last-updated" class="last-updated">—</div>
+
+          <div id="now-loading" class="skeleton-overlay" hidden>
+            <div class="skeleton skeleton--speed"></div>
+            <div class="skeleton skeleton--direction"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Headwind -->
+      <div class="card" id="card-headwind">
+        <div class="card__header">
+          <span class="card__label">Headwind</span>
+        </div>
+
+        <div class="headwind-card__body">
+          <div id="headwind-badge" class="headwind-badge headwind-badge--headwind">HEADWIND</div>
+
+          <div class="headwind-compass-container">
+            <svg id="headwind-compass" class="headwind-compass" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Background circle -->
+              <circle cx="100" cy="100" r="90" stroke="#E2E8F0" stroke-width="1.5" fill="#F0F4F8"/>
+              <!-- Tailwind arc (green, -90 to +90 from heading) -->
+              <path id="tailwind-arc" d="" stroke="#22C55E" stroke-width="8" stroke-linecap="round" opacity="0.35"/>
+              <!-- Headwind arc (red, +90 to +270 from heading) -->
+              <path id="headwind-arc" d="" stroke="#EF4444" stroke-width="8" stroke-linecap="round" opacity="0.35"/>
+              <!-- Cardinal labels -->
+              <text x="100" y="20" text-anchor="middle" font-family="DM Sans" font-size="12" font-weight="700" fill="#0F172A">N</text>
+              <text x="185" y="105" text-anchor="middle" font-family="DM Sans" font-size="12" font-weight="700" fill="#0F172A">E</text>
+              <text x="100" y="188" text-anchor="middle" font-family="DM Sans" font-size="12" font-weight="700" fill="#0F172A">S</text>
+              <text x="15" y="105" text-anchor="middle" font-family="DM Sans" font-size="12" font-weight="700" fill="#0F172A">W</text>
+              <!-- Cyclist heading line -->
+              <line id="heading-line" x1="100" y1="100" x2="100" y2="25" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round"/>
+              <!-- Heading arrow head -->
+              <polygon id="heading-arrow" points="100,20 94,32 100,28 106,32" fill="#0F172A"/>
+              <!-- Wind direction line -->
+              <line id="wind-line" x1="100" y1="100" x2="100" y2="30" stroke="#0EA5E9" stroke-width="2" stroke-linecap="round"/>
+              <!-- Wind arrow head -->
+              <polygon id="wind-arrow" points="100,25 96,35 100,33 104,35" fill="#0EA5E9"/>
+              <!-- Drag handle -->
+              <circle id="heading-handle" cx="100" cy="25" r="10" fill="#0F172A" class="heading-handle"/>
+              <!-- Centre dot -->
+              <circle cx="100" cy="100" r="4" fill="#0F172A"/>
+            </svg>
+          </div>
+
+          <div class="headwind-values">
+            <div class="headwind-magnitude">
+              <span id="headwind-speed" class="headwind-magnitude__value">—</span>
+              <span id="headwind-unit" class="headwind-magnitude__unit">kt</span>
+            </div>
+            <div class="headwind-crosswind-row">
+              <span class="headwind-label">Crosswind</span>
+              <span id="crosswind-speed" class="headwind-crosswind-val">— <span id="crosswind-unit">kt</span></span>
+            </div>
+          </div>
+
+          <div id="headwind-summary" class="headwind-summary">Set your heading to calculate headwind.</div>
+        </div>
+      </div>
+
+    <nav id="bottom-nav" class="bottom-nav">
+      <button class="bottom-nav__dot active" data-index="0" aria-label="Now"></button>
+      <button class="bottom-nav__dot" data-index="1" aria-label="Headwind"></button>
+    </nav>
+  </div>
+
+  <!-- Station picker modal -->
+  <div id="station-picker-modal" class="modal-overlay" hidden>
+    <div class="bottom-sheet" id="station-picker-sheet">
+      <div class="bottom-sheet__handle"></div>
+      <div class="bottom-sheet__header">
+        <h2>Select Station</h2>
+        <button id="btn-close-station-picker" class="icon-btn" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="bottom-sheet__search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" id="station-search-input" class="search-input" placeholder="Search stations…" />
+      </div>
+      <div id="station-picker-list" class="bottom-sheet__list"></div>
+    </div>
+  </div>
+
+  <!-- Settings sheet -->
+  <div id="settings-modal" class="modal-overlay" hidden>
+    <div class="bottom-sheet" id="settings-sheet">
+      <div class="bottom-sheet__handle"></div>
+      <div class="bottom-sheet__header">
+        <h2>Settings</h2>
+        <button id="btn-close-settings" class="icon-btn" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="settings-section">
+        <h3 class="settings-section__title">Units</h3>
+        <div class="settings-row">
+          <span>Wind speed</span>
+          <div id="settings-unit-toggle" class="unit-toggle">
+            <button class="unit-toggle__btn active" data-unit="knots">kt</button>
+            <button class="unit-toggle__btn" data-unit="kmh">km/h</button>
+            <button class="unit-toggle__btn" data-unit="ms">m/s</button>
+          </div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h3 class="settings-section__title">Refresh interval</h3>
+        <div class="settings-row">
+          <span>Auto-refresh</span>
+          <select id="settings-interval" class="settings-select">
+            <option value="60000">1 min</option>
+            <option value="300000" selected>5 min</option>
+            <option value="900000">15 min</option>
+            <option value="1800000">30 min</option>
+          </select>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h3 class="settings-section__title">Data</h3>
+        <div class="settings-row">
+          <span>Clear cached data</span>
+          <button id="btn-clear-cache" class="btn btn--danger">Clear</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h3 class="settings-section__title">About</h3>
+        <div class="settings-row settings-row--about">
+          <span>Singapore Wind</span>
+          <span class="settings-about">v1.0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js?v=5"></script>
+</body>
+</html>
