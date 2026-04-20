@@ -169,13 +169,14 @@ export const parseHistoricalCSV = (csvText, stationId, type) => {
 
   if (dateIdx === -1 || stationIdx === -1 || valueIdx === -1) {
     // Try fallback column names
-    const fallbackValueIdx = 2; // generic fallback
+    const fallbackValueIdx = header.length > 2 ? 2 : -1;
+    if (fallbackValueIdx === -1) return [];
     return lines.slice(1).reduce((acc, line) => {
       const cols = line.split(',').map((c) => c.trim().replace(/"/g, ''));
       if (cols[stationIdx] === stationId) {
         acc.push({
           date: cols[dateIdx],
-          value: parseFloat(cols[valueIdx >= 0 ? valueIdx : fallbackValueIdx]) || 0,
+          value: parseFloat(cols[fallbackValueIdx]) || 0,
         });
       }
       return acc;
