@@ -47,7 +47,7 @@ const store = createStore({
   windDirection: null,
   windTimestamp: null,
   historicalData: [],
-  unit: 'knots',
+  unit: 'km/h',
   pollingInterval: 5 * 60 * 1000,
   isOnline: navigator.onLine,
   isLoading: { now: false, history: false },
