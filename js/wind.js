@@ -17,25 +17,31 @@ export const CONVERSIONS = {
 
 export const formatSpeed = (knots, unit) => {
   switch (unit) {
-    case 'kmh': return CONVERSIONS.toKmh(knots).toFixed(1);
-    case 'ms':  return CONVERSIONS.toMs(knots).toFixed(1);
-    default:    return knots.toFixed(1);
+    case 'kmh':
+    case 'km/h': return CONVERSIONS.toKmh(knots).toFixed(1);
+    case 'ms':
+    case 'm/s':  return CONVERSIONS.toMs(knots).toFixed(1);
+    default:      return knots.toFixed(1);
   }
 };
 
 export const getUnitLabel = (unit) => {
   switch (unit) {
-    case 'kmh': return 'km/h';
-    case 'ms':  return 'm/s';
-    default:    return 'kt';
+    case 'kmh':
+    case 'km/h': return 'km/h';
+    case 'ms':
+    case 'm/s':  return 'm/s';
+    default:     return 'kt';
   }
 };
 
 export const getSpeedValue = (knots, unit) => {
   switch (unit) {
-    case 'kmh': return CONVERSIONS.toKmh(knots);
-    case 'ms':  return CONVERSIONS.toMs(knots);
-    default:    return knots;
+    case 'kmh':
+    case 'km/h': return CONVERSIONS.toKmh(knots);
+    case 'ms':
+    case 'm/s':  return CONVERSIONS.toMs(knots);
+    default:     return knots;
   }
 };
 
