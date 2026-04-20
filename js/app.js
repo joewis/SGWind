@@ -52,7 +52,7 @@ const init = async () => {
   // Restore persisted state
   const savedStation = loadFromLS(LS_KEYS.station, null);
   const savedHeading = loadFromLS(LS_KEYS.heading, 0);
-  const savedUnit = loadFromLS(LS_KEYS.unit, 'knots');
+  const savedUnit = loadFromLS(LS_KEYS.unit, 'km/h');
   const savedInterval = loadFromLS(LS_KEYS.interval, 5 * 60 * 1000);
 
   setState({
