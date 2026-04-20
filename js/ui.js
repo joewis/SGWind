@@ -40,6 +40,7 @@ export const formatRelativeTime = (isoString) => {
  */
 export const renderStationSuggestions = (stations, onSelect) => {
   const list = $('#station-setup-list');
+  if (!list) return;
   list.innerHTML = '';
   for (const s of stations) {
     const btn = document.createElement('button');
@@ -147,29 +148,31 @@ export const renderHeadwind = (windSpeed, windDir, heading, unit) => {
 
   const { headwind, crosswind, label } = calcWindComponents(windSpeed, windDir, heading);
   const unitLabel = getUnitLabel(unit);
-  const speedVal = getSpeedValue(headwind, unit).toFixed(1);
-  const crossVal = getSpeedValue(crosswind, unit).toFixed(1);
+  const speedVal = getSpeedValue(headwind, unit);
+  const crossVal = getSpeedValue(crosswind, unit);
 
   // Badge
   badge.textContent = label;
   badge.className = `headwind-badge headwind-badge--${label.toLowerCase()}`;
 
   // Headwind magnitude
-  if (headwindSpeedEl) headwindSpeedEl.textContent = Math.abs(parseFloat(speedVal)).toFixed(1);
+  if (headwindSpeedEl) headwindSpeedEl.textContent = Math.abs(speedVal).toFixed(1);
   if (headwindUnitEl) headwindUnitEl.textContent = unitLabel;
-  if (crosswindSpeedEl) crosswindSpeedEl.textContent = parseFloat(crossVal).toFixed(1);
+  if (crosswindSpeedEl) crosswindSpeedEl.textContent = crossVal.toFixed(1);
   if (crosswindUnitEl) crosswindUnitEl.textContent = unitLabel;
 
   // Summary
   if (summaryEl) {
     const windDirCardinal = degreesToCardinal(windDir);
     const windSpeedFormatted = formatSpeed(windSpeed, unit);
+    const absSpeedVal = Math.abs(speedVal).toFixed(1);
+    const absCrossVal = Math.abs(crossVal).toFixed(1);
     if (label === 'HEADWIND') {
-      summaryEl.textContent = `Winds from ${windDirCardinal} at ${windSpeedFormatted}${unitLabel}. You're riding into a ${Math.abs(parseFloat(speedVal))}${unitLabel} headwind.`;
+      summaryEl.textContent = `Winds from ${windDirCardinal} at ${windSpeedFormatted}${unitLabel}. You're riding into a ${absSpeedVal}${unitLabel} headwind.`;
     } else if (label === 'TAILWIND') {
-      summaryEl.textContent = `Winds from ${windDirCardinal} at ${windSpeedFormatted}${unitLabel}. You've got a ${Math.abs(parseFloat(speedVal))}${unitLabel} tailwind behind you.`;
+      summaryEl.textContent = `Winds from ${windDirCardinal} at ${windSpeedFormatted}${unitLabel}. You've got a ${absSpeedVal}${unitLabel} tailwind behind you.`;
     } else {
-      summaryEl.textContent = `Winds from ${windDirCardinal} at ${windSpeedFormatted}${unitLabel}. ${Math.abs(parseFloat(crossVal))}${unitLabel} of crosswind on your left/right.`;
+      summaryEl.textContent = `Winds from ${windDirCardinal} at ${windSpeedFormatted}${unitLabel}. ${absCrossVal}${unitLabel} of crosswind on your left/right.`;
     }
   }
 
