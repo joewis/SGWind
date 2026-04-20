@@ -350,8 +350,9 @@ export const setActiveDot = (index) => {
  * Update unit toggle active state.
  */
 export const setActiveUnit = (unit) => {
+  const normalised = unit.replace('km/h', 'kmh').replace('m/s', 'ms');
   $$('.unit-toggle__btn').forEach((btn) => {
-    btn.classList.toggle('active', btn.dataset.unit === unit);
+    btn.classList.toggle('active', btn.dataset.unit === normalised);
   });
 };
 
