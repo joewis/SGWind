@@ -353,6 +353,12 @@ const setupHeadingSelector = () => {
 // ─── Unit Toggle ────────────────────────────────────────────────────────────
 
 const setupUnitToggle = () => {
+  // Sync unit to state and force re-render in correct unit on first load
+  const { unit, windSpeed, windDirection, cyclistHeading } = getState();
+  setActiveUnit(unit);
+  renderWindSpeed(windSpeed, unit);
+  renderHeadwind(windSpeed, windDirection, cyclistHeading, unit);
+
   $$('.unit-toggle__btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const unit = btn.dataset.unit;
