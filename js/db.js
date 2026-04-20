@@ -204,28 +204,8 @@ export const loadHistoricalData = async (stationId, stationName, type = 'speed',
     insertStmt.free();
     await persistDb(db, key);
 
-    // Return last 7 days by querying the DB directly (avoid recursive call)
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const cutoff = sevenDaysAgo.toISOString().split('T')[0];
-
-    const result = db.exec(`
-      SELECT date, mean_speed, max_speed, min_speed, mean_dir
-      FROM wind_history
-      WHERE date >= '${cutoff}'
-      ORDER BY date ASC
-    `);
-
-    if (result.length > 0 && result[0].values.length > 0) {
-      return result[0].values.map(([date, mean_speed, max_speed, min_speed, mean_dir]) => ({
-        date,
-        mean_wind_speed: mean_speed,
-        max_wind_speed: max_speed,
-        min_wind_speed: min_speed,
-        mean_wind_dir: mean_dir,
-      }));
-    }
-    return [];
+    // Return last 7 days
+    return loadHistoricalData(stationId, stationName, type, 7);
   } catch (err) {
     console.error('loadHistoricalData error:', err);
     return [];
