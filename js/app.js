@@ -61,8 +61,9 @@ const init = async () => {
     pollingInterval: savedInterval,
   });
 
-  // Apply unit toggle UI state
+  // Apply unit toggle UI state and re-render values in correct unit
   setActiveUnit(savedUnit);
+  renderWindSpeed(getState().windSpeed, savedUnit);
 
   // Settings interval
   const intervalEl = $('#settings-interval');
